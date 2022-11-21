@@ -13,7 +13,11 @@ def main(args):
         return 0
 
     file_name = args[1]
-    port = args[2]
+    try:
+        port = int(args[2])
+    except ValueError:
+        print("usage: python3 load-json.py <file_name> <port_number>")
+        return 0
     client = MongoClient(host="localhost", port=int(port))
 
     # initialize your mongo db connection here. Refer to sample lab code from last week if necessary.
