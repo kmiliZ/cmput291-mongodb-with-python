@@ -18,7 +18,7 @@ def main(args):
     except ValueError:
         print("usage: python3 load-json.py <file_name> <port_number>")
         return 0
-    client = MongoClient(host="localhost", port=int(port))
+    client = MongoClient(host="localhost", port=port)
 
     # initialize your mongo db connection here. Refer to sample lab code from last week if necessary.
     db = client[DATABASENAME]
@@ -34,19 +34,6 @@ def main(args):
     for chunk in chunks:
         print(chunk)
         collection.insert_many(chunk.to_dict("records"))
-
-    # os.system("mongoimport --db {} --collection {} --type=json --file {}".format(DATABASENAME,COLLECTIONAME,file_name))
-    
-    # collection.insert_one({
-    #     "_id": "ac1",
-    #     "name": "AC3 Phone",
-    #     "brand": "ACME",
-    #     "type": "phone",
-    #     "monthly_price": 200,
-    #     "rating": 1.8,
-    #     "warranty_years": 1,
-    #     "available": "true"
-    # })
     
     print("gg")
 
