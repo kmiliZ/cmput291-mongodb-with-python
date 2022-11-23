@@ -1,5 +1,5 @@
 from pymongo import MongoClient
-
+import Search
 def printMenu():
     menu = '''
     Please choose one of the following options:
@@ -11,11 +11,11 @@ def printMenu():
     '''
     print(menu)
 
-def processInput(choice):
+def processInput(choice,collection):
     if (choice == 1):
         print("chocice 1")
     elif (choice == 2):
-        print("chocice 2")
+        Search.searchAuthors(collection)
     elif (choice == 3):
         print("chocice 3")
     elif (choice == 4):
@@ -28,7 +28,8 @@ def main():
     COLLECTIONAME = "dblp"
     DATABASENAME = "291db"
     while(1):
-        port = input("enter port number\n")
+        port = 27012
+        # port = input("enter port number\n")
         try:
             port = int(port)
             break
@@ -49,7 +50,7 @@ def main():
         if (choice>5 or choice<1):
             print("invalid input. Please enter an index number of the menu")
         else:
-            if(processInput(choice)):
+            if(processInput(choice,collection)):
                 break
 
     
