@@ -14,11 +14,11 @@ def printMenu():
     '''
     print(menu)
 
-def processInput(choice,collection):
+def processInput(choice):
     if (choice == 1):
         print("chocice 1")
     elif (choice == 2):
-        Search.searchAuthors(collection)
+        Search.searchAuthors()
     elif (choice == 3):
         print("chocice 3")
         listvenues.listVenues()
@@ -42,7 +42,7 @@ def main():
         if (choice>5 or choice<1):
             print("invalid input. Please enter an index number of the menu")
         else:
-            if(processInput(choice,collection)):
+            if(processInput(choice)):
                 break
 
 if __name__ == "__main__":
