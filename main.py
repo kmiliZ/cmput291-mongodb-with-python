@@ -20,6 +20,7 @@ def processInput(choice):
         print("chocice 2")
     elif (choice == 3):
         print("chocice 3")
+        listvenues.listVenues()
     elif (choice == 4):
         print("chocice 4")
     else:
@@ -27,7 +28,7 @@ def processInput(choice):
     return 0
 
 def main():  
-    datahandler.connectDB(db, collection)
+    datahandler.connectDB()
     
     while(1):
         printMenu()

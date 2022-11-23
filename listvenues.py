@@ -1,7 +1,8 @@
 import datahandler
 
 def displayTopVenues(userInput):
-    userInput
+    topVenues = datahandler.getTopReferencedVenues(userInput)
+    topVenues
     
 def listVenues():
     
