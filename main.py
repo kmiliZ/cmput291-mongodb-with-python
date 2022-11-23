@@ -1,5 +1,8 @@
 from pymongo import MongoClient
 import Search
+import listvenues
+import datahandler
+
 def printMenu():
     menu = '''
     Please choose one of the following options:
@@ -24,21 +27,8 @@ def processInput(choice,collection):
         return 1
     return 0
 
-def main():
-    COLLECTIONAME = "dblp"
-    DATABASENAME = "291db"
-    while(1):
-        port = 27012
-        # port = input("enter port number\n")
-        try:
-            port = int(port)
-            break
-        except ValueError:
-            print("please enter a integer for port number")
-    client = MongoClient(host="localhost", port=port)
-    db = client[DATABASENAME]
-    collection = db[COLLECTIONAME]
-    ## TODO: check if collection if empty?
+def main():  
+    datahandler.connectDB(db, collection)
     while(1):
         printMenu()
         choice = input('> ')
@@ -52,12 +42,6 @@ def main():
         else:
             if(processInput(choice,collection)):
                 break
-
-    
-    
-    
-
-
 
 if __name__ == "__main__":
     main()

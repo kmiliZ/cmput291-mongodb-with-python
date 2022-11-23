@@ -30,13 +30,13 @@ def main(args):
     collection = db[COLLECTIONAME]
     
     chunks = pd.read_json(file_name, lines=True, chunksize=10000)
-    
+    count = 1
     for chunk in chunks:
-        print(chunk)
+        print(count)
+        count += 1
         collection.insert_many(chunk.to_dict("records"))
     
-    print("gg")
-
+    print("Load successful :D")
 
 if __name__ == "__main__":
     main(sys.argv)
