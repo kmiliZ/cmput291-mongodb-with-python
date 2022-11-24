@@ -84,8 +84,8 @@ def main(args):
                     "as": "refs"
                 }
         },
-        {"$unwind": "$refs"},
-        {"$unwind": "$refs.ids"},
+        {"$unwind": {"path": "$refs", "preserveNullAndEmptyArrays": True}},
+        {"$unwind": {"path": "$refs.ids", "preserveNullAndEmptyArrays": True}},
         {"$group": {"_id": "$_id", "refids": {"$addToSet": "$refs.ids"}}},
         {
             "$project": {

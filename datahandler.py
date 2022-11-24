@@ -1,10 +1,8 @@
 from bson.son import SON
 from pymongo import MongoClient
-from pymongo import TEXT
 from itertools import islice
 from pymongo import ASCENDING
 from pymongo import DESCENDING
-from pymongo import TEXT
 
 db = None
 collection = None
@@ -45,8 +43,34 @@ def getVenuesArticleCount(venue):
     return int(venueartcnt.find({"_id": venue})[0]["count"])
 
 def getTopReferencedVenues(topN):
+    """find top N venues in term of the number of articles referencing the venue
+
+    Args:
+        topN (int): number of venues to be returned
+
+    Returns:
+        cursor: containing topN venues and number of articles referencing the venue
+    """
     # https://stackoverflow.com/questions/4421207/how-to-get-the-last-n-records-in-mongodb
     return venuerefedcnt.find().limit(topN)
+
+# addArticle
+
+def checkId(id):
+    return len(list(collection.find({"id": id})))==0
+
+def addArticle(id, title, authors, year):
+    collection.insert_one({
+        "abstract": None, 
+        "authors": authors, 
+        "n_citation": 0,
+        "references": [], 
+        "title": title, 
+        "venue": None, 
+        "year": year, 
+        "id": id
+        })
+
 
 ###
 # search authors by keyword. will return a list of authors who have name
