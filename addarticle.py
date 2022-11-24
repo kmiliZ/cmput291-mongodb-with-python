@@ -2,7 +2,7 @@ import datahandler
 
 id = None
 title = None
-authors = None
+authors = []
 year = None
 
 def addAnArticle():
@@ -27,12 +27,19 @@ def addAnArticle():
         break
         
     while(notExit):
-        print("Please enter a list of authors seperated by space or enter nothing to exit.")
-        authors = input("> ").strip()
-        if(authors == ""):
-            notExit = False
+        prompt = """
+        Please enter one of the authors' names.
+        Enter nothing after all authors have been entered.
+        """
+        print(prompt)
+        count = 0
+        author = input("> ").strip()
+        if(authors == "" and count > 0):
+            break
+        elif(author == ""):
+            print("Please enter at least one author name.")
             continue
-        authors = authors.split()
+        authors += [author]
         break
         
     while(notExit):
