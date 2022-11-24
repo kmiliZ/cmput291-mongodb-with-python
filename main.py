@@ -17,9 +17,9 @@ def printMenu():
 def processInput(choice):
     if (choice == 1):
         print("chocice 1")
-        searchArticles.searchArticles()
+        searchAuthors.searchArticles()
     elif (choice == 2):
-        Search.searchAuthors()
+        searchAuthors.searchAuthors()
     elif (choice == 3):
         print("chocice 3")
         listvenues.listVenues()
