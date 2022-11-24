@@ -16,8 +16,8 @@ def connectDB():
     VENUEREFEDCNT = "venuerefedcnt"
     DATABASENAME = "291db"
     while(1):
-        # port = input("enter port number\n")
-        port = 27012
+        port = input("enter port number\n")
+        # port = 27012
         try:
             port = int(port)
             break
