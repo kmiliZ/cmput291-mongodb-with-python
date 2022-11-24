@@ -1,8 +1,23 @@
 import datahandler
 
+def showTopVenue(venue, artCnt, refCnt):
+    myStr = """
+    Venue:
+    {}
+    Articles in the venue: {}
+    Number of articles reference the venue: {}
+    """.format(venue, artCnt, refCnt)
+    
+    print(myStr)
+    
 def displayTopVenues(userInput):
     topVenues = datahandler.getTopReferencedVenues(userInput)
-    topVenues
+    for i in topVenues:
+        venue = i["_id"]
+        artCnt = datahandler.getVenuesArticleCount(venue)
+        refCnt = i["count"]
+        showTopVenue(venue, artCnt, refCnt)
+        
     
 def listVenues():
     

@@ -9,11 +9,13 @@ from pymongo import TEXT
 db = None
 collection = None
 venueartcnt = None
+venuerefedcnt = None
 
 def connectDB():
-    global db, collection, venueartcnt
+    global db, collection, venueartcnt, venuerefedcnt
     COLLECTIONAME = "dblp"
     VENUEARTCNT = "venueartcnt"
+    VENUEREFEDCNT = "venuerefedcnt"
     DATABASENAME = "291db"
     while(1):
         # port = input("enter port number\n")
@@ -27,7 +29,7 @@ def connectDB():
     db = client[DATABASENAME]
     collection = db[COLLECTIONAME]
     venueartcnt = db[VENUEARTCNT]
-    ## TODO: check if collection if empty?
+    venuerefedcnt = db[VENUEREFEDCNT]
     
 # listVenues
 
@@ -40,36 +42,11 @@ def getVenuesArticleCount(venue):
     Returns:
         int: number of articles in that venue
     """
-    return int(venueartcnt.findOne({"_id": venue}).count)
-
-def getReferenceCount():
-    # https://stackoverflow.com/questions/944700/how-can-i-check-for-nan-values
-    # https://stackoverflow.com/questions/4057196/how-do-you-query-for-is-not-null-in-mongo
-    return collection.find({"references": {"$nin": [None, float('nan'), ""]}})
+    return int(venueartcnt.find({"_id": venue})[0]["count"])
 
 def getTopReferencedVenues(topN):
-    refCnt = getReferenceCount()
-    
-    venuesRefDict = {}
-    for i in refCnt:
-        # keep a track of all the venues in the references set avoid double counting
-        venues = []
-        debug = i["references"] 
-        for ref in i["references"]:
-            art = list(collection.find({"id": ref}, {"venue": 1}))
-            # check whether the cursor is empty
-            if (len(art)==0):
-                continue
-            else:
-                venue = art[0]["venue"]
-                if venue not in venues and venue != "":
-                    venues += [venue]
-                    if venue in venuesRefDict:
-                        venuesRefDict[venue] += 1
-                    else:
-                        venuesRefDict[venue] = 1
-                
-    return list(islice(sorted(venuesRefDict.items(), key=lambda item: item[1]), topN))
+    # https://stackoverflow.com/questions/4421207/how-to-get-the-last-n-records-in-mongodb
+    return venuerefedcnt.find().limit(topN)
 
 ###
 # search authors by keyword. will return a list of authors who have name

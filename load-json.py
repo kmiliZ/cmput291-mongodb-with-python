@@ -8,6 +8,10 @@ import pandas as pd
 def main(args):
     DATABASENAME = "291db"
     COLLECTIONAME = "dblp"
+    VENUEARTCNT = "venueartcnt"
+    REFIDS = "refids"
+    VENUEREFEDCNT = "venuerefedcnt"
+    
     if (len(args) < 3):
         print("usage: python3 load-json.py <file_name> <port_number>")
         return 0
@@ -26,6 +30,12 @@ def main(args):
     collection_list = db.list_collection_names()
     if (COLLECTIONAME in collection_list):
         db.drop_collection(COLLECTIONAME)
+    if (VENUEARTCNT in collection_list):
+        db.drop_collection(VENUEARTCNT)
+    if (REFIDS in collection_list):
+        db.drop_collection(REFIDS)
+    if (VENUEREFEDCNT in collection_list):
+        db.drop_collection(VENUEREFEDCNT)
 
     collection = db[COLLECTIONAME]
     
@@ -49,6 +59,7 @@ def main(args):
     ]
     collection.aggregate(pipeline1)
     
+    # create a materialized view refids contains references and ids of articals containing the reference
     pipeline2 = [
         {"$match": {"references": {"$nin": [None, float('nan'), ""]}}},
         {"$unwind": "$references"},
@@ -57,7 +68,10 @@ def main(args):
     ]
     collection.aggregate(pipeline2)
     
+    # create a materialized view venuerefedcnt contains venues and number of articles that reference the venue
     pipeline3 = [
+        # https://stackoverflow.com/questions/944700/how-can-i-check-for-nan-values
+        # https://stackoverflow.com/questions/4057196/how-do-you-query-for-is-not-null-in-mongo
         {"$match": {"venue": {"$nin": [None, float('nan'), ""]}}},
         {"$group": {"_id": "$venue", "ids": {"$addToSet": "$id"}}},
         {"$unwind": "$ids"},
@@ -82,6 +96,8 @@ def main(args):
         {"$merge": {"into": "venuerefedcnt", "whenMatched": "replace"}}
     ]
     collection.aggregate(pipeline3)
+    
+    print("Materialized Views generated :D")
 
 if __name__ == "__main__":
     main(sys.argv)
