@@ -19,7 +19,7 @@ def processInput(choice):
         print("chocice 1")
         searchArticles.searchArticles()
     elif (choice == 2):
-        return searchAuthors.searchAuthors()
+        Search.searchAuthors()
     elif (choice == 3):
         print("chocice 3")
         listvenues.listVenues()

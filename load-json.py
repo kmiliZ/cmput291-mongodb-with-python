@@ -39,6 +39,16 @@ def main(args):
     collection.create_index(keys=[("title",TEXT),("authors",TEXT),("abstract", TEXT),("venue",TEXT),("references",TEXT)],default_language='english')
     
     print("Load successful :D")
+    
+    # create a materialized view venueartcnt contains venues and count of articals in each venue
+    # https://www.mongodb.com/docs/manual/core/materialized-views/#std-label-manual-materialized-views
+    pipeline = [
+        {"$unwind": "$venue"},
+        {"$match": {"venue": {"$nin": [None, float('nan'), ""]}}},
+        {"$group": {"_id": "$venue", "count": {"$sum": 1}}},
+        {"$merge": {"into": "venueartcnt", "whenMatched": "replace"}}
+    ]
+    collection.aggregate(pipeline)
 
 if __name__ == "__main__":
     main(sys.argv)

@@ -1,5 +1,6 @@
 from bson.son import SON
 from pymongo import MongoClient
+from pymongo import TEXT
 from itertools import islice
 from pymongo import ASCENDING
 from pymongo import DESCENDING
