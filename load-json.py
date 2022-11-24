@@ -47,7 +47,7 @@ def main(args):
         collection.insert_many(chunk.to_dict("records"))
         
     collection.update_many({}, [{"$set": {"year": {"$toString": "$year"}}}])
-    collection.create_index(keys=[("title",TEXT),("authors",TEXT),("abstract", TEXT),("venue",TEXT),("year",TEXT),("references",TEXT)],default_language='english')
+    collection.create_index(keys=[("title",TEXT),("authors",TEXT),("abstract", TEXT),("venue",TEXT),("year",TEXT),("references",TEXT)])
     
     print("Load successful :D")
     

@@ -55,8 +55,17 @@ def takeAuthorIndexSelectionInput(count):
 
 def searchAuthors():
     print("search for authors")
-    
-    keyword = input("enter a key word:")
+
+    while(1):
+        keyword = input("enter a key word> ")
+        keyword_num = len(keyword.split())
+        if (keyword_num >1):
+            print("\nFAIL: please provide only one keyword\n")
+            continue
+        elif (keyword_num == 0):
+            print("\nFAIL: plase provide a keyword\n")
+            continue
+        break
 
     authors = datahandler.searchAuthorsByKeyWord(keyword)
     printAuthorSelectionMenu(len(authors))

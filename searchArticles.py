@@ -62,7 +62,7 @@ def printSelectedArticle(selected_article):
 
 def searchArticles():
     input_keys = input("enter key words in one line, separated by space:")
-    keywords = input_keys.split(' ')
+    keywords = input_keys.split()
     results = datahandler.searchArticlesByKeyWords(keywords)
     count = 0
     articles = []
@@ -74,8 +74,7 @@ def searchArticles():
         articles.append(result)
 
         count +=1
-        print("%5d. title: %s\n       year: %s\n       venue: %s\n       id: %s"%(count,title,year,venue,id))
-
+        print("    %d. title: %s\n       year: %s\n       venue: %s\n       id: %s"%(count,title,year,venue,id))
     printArticleSelectionMenu(count)
     index = takeArticleIndexSelectionInput(count)
     if index==0:

@@ -71,19 +71,21 @@ def addArticle(id, title, authors, year):
         "id": id
         })
 
-
-###
-# search authors by keyword. will return a list of authors who have name
-#   contains the keyword
-###
 def searchAuthorsByKeyWord(keyword):
-    # collection.create_index(name='author_index', keys=[('authors', TEXT)], default_language='english')
+    '''
+    search authors by keyword. will return a list of authors who have name
+    contains the keyword
+    '''
     results = collection.aggregate([{"$match":{"$text": {"$search": keyword}}},{"$unwind": "$authors"}])
     authors = []
     for r in results:
         author = r["authors"]
-        if keyword.lower() in author.lower():
-            authors.append(author)
+        author_name = r["authors"].split()
+        for a in author_name:
+            if a.lower() == keyword.lower():
+                authors.append(author)
+                break
+            
     count = 0
     authors = list(dict.fromkeys(authors))
 
@@ -91,16 +93,16 @@ def searchAuthorsByKeyWord(keyword):
         count = count+1
         name = "\"{}\"".format(a)
         collection_count = collection.count_documents({"$text": {"$search": name}})
-        print("%5d. %s\n        #of publications:%d"%(count,a,collection_count))     
+        print("  %d. %s\n        #of publications:%d"%(count,a,collection_count))     
     print("%d mathing results\n"%(count))
     
     return authors
 
-###
-# search all aritiles by author name, and print out each artile's
-#   title, venu, and year.
-###
 def searchAuthorArticlesByName(author):
+    '''
+    search all aritiles by author name, and print out each artile's
+    title, venu, and year.
+    '''
     name = "\"{}\"".format(author)
     results = collection.find({"$text": {"$search": name}}).sort("year",DESCENDING)
     count = 1
@@ -118,6 +120,11 @@ def searchArticlesByKeyWords(keywords):
     return results
 
 def getReferencesByArticleId(id):
+    '''
+    get all the articles that referenced the given id by
+    geting all the documents containing the id except the one
+    with "id" field equals to id(which is the document itself)
+    '''
     search_string = "\"{}\"".format(id)
     results = collection.find({"$text": {"$search": search_string}})
     count = 0
@@ -127,7 +134,7 @@ def getReferencesByArticleId(id):
             id = result["id"]
             title = result["title"]
             year = result["year"]
-            print("     %5d. %s\n           year: %s\n          id: %s"%(count,title,year,id))
+            print("         %d. %s\n           year: %s\n          id: %s"%(count,title,year,id))
     print("      # %d results #"%(count))
 
 
