@@ -25,22 +25,23 @@ def addAnArticle():
             notExit = False
             continue
         break
-        
+     
+    count = 0  
     while(notExit):
         prompt = """
         Please enter one of the authors' names.
         Enter nothing after all authors have been entered.
         """
         print(prompt)
-        count = 0
+        
         author = input("> ").strip()
-        if(authors == "" and count > 0):
+        if((author == "") and (count > 0)):
             break
         elif(author == ""):
             print("Please enter at least one author name.")
             continue
         authors += [author]
-        break
+        count += 1
         
     while(notExit):
         print("Please enter a year or enter nothing to exit.")
