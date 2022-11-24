@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+from pymongo import TEXT
 import json
 import os
 import sys
@@ -35,6 +36,7 @@ def main(args):
         print(count)
         count += 1
         collection.insert_many(chunk.to_dict("records"))
+    collection.create_index(keys=[("title",TEXT),("authors",TEXT),("abstract", TEXT),("venue",TEXT),("references",TEXT)],default_language='english')
     
     print("Load successful :D")
 

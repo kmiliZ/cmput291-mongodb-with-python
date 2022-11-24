@@ -65,36 +65,39 @@ def getTopReferencedVenues(topN):
                 
     return list(islice(sorted(venuesRefDict.items(), key=lambda item: item[1]), topN))
 
-
-def searchAuthorsB():
-    print("search for authors")
-    
-    keyword = input("enter a key word:")
-    
-    collection.create_index(name='author_index', keys=[('authors', TEXT)], default_language='english')
-    # maybe onwind the authors then do search on that?
-    # https://stackoverflow.com/questions/12296963/mongodb-aggregation-how-to-return-only-matching-elements-of-an-array
-    # https://www.mongodb.com/docs/manual/reference/operator/aggregation/unwind/
-
-    # results = collection.find({"$text": {"$search": keyword}},{"_id":0,"authors":1})
+###
+# search authors by keyword. will return a list of authors who have name
+#   contains the keyword
+###
+def searchAuthorsByKeyWord(keyword):
+    # collection.create_index(name='author_index', keys=[('authors', TEXT)], default_language='english')
     results = collection.aggregate([{"$match":{"$text": {"$search": keyword}}},{"$unwind": "$authors"}])
-    count = 0
     authors = []
-    matching_doc = []
     for r in results:
         author = r["authors"]
         if keyword.lower() in author.lower():
-            matching_doc.append(r)
             authors.append(author)
+    count = 0
     authors = list(dict.fromkeys(authors))
+
     for a in authors:
         count = count+1
-        collection_count = collection.count_documents({"authors":a})
+        name = "\"{}\"".format(a)
+        collection_count = collection.count_documents({"$text": {"$search": name}})
         print("%5d. %s\n        #of publications:%d"%(count,a,collection_count))     
-    print("%d mathing results"%(count))
+    print("%d mathing results\n"%(count))
+    
+    return authors
 
-    # TODO: allow user to select by index
-    # TODO: search selected user in matching_doc, and return results.
-
-
-# db for addarticle
+###
+# search all aritiles by author name, and print out each artile's
+#   title, venu, and year.
+###
+def searchAuthorArticlesByName(author):
+    name = "\"{}\"".format(author)
+    results = collection.find({"$text": {"$search": name}}).sort("year",DESCENDING)
+    count = 1
+    for r in results:
+        print(" {}. title:  {} \n    venue: {} \n    year:  {}".format(count,r["title"],r["venue"],r["year"]))
+        count = count +1
+    print("\n%d articles in total."%(count-1))
