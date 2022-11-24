@@ -3,14 +3,17 @@ from pymongo import MongoClient
 from itertools import islice
 from pymongo import ASCENDING
 from pymongo import DESCENDING
-from pymongo import TEXT
 
 db = None
 collection = None
+venueartcnt = None
+venuerefedcnt = None
 
 def connectDB():
-    global db, collection
+    global db, collection, venueartcnt, venuerefedcnt
     COLLECTIONAME = "dblp"
+    VENUEARTCNT = "venueartcnt"
+    VENUEREFEDCNT = "venuerefedcnt"
     DATABASENAME = "291db"
     while(1):
         # port = input("enter port number\n")
@@ -23,47 +26,51 @@ def connectDB():
     client = MongoClient(host="localhost", port=port)
     db = client[DATABASENAME]
     collection = db[COLLECTIONAME]
-    ## TODO: check if collection if empty?
+    venueartcnt = db[VENUEARTCNT]
+    venuerefedcnt = db[VENUEREFEDCNT]
     
-# db for search
+# listVenues
 
-# db for listvenues
-def getVenuesArticleCount():
-    pipeline = [
-        {"$unwind": "$venue"},
-        {"$group": {"_id": "$venue", "count": {"$sum": 1}}}
-    ]
+def getVenuesArticleCount(venue):
+    """returns number of articles in the given venue
 
-    return collection.aggregate(pipeline)
+    Args:
+        venue (string): name of the venue
 
-def getReferenceCount():
-    # https://stackoverflow.com/questions/944700/how-can-i-check-for-nan-values
-    # https://stackoverflow.com/questions/4057196/how-do-you-query-for-is-not-null-in-mongo
-    return collection.find({"references": {"$nin": [None, float('nan'), ""]}})
+    Returns:
+        int: number of articles in that venue
+    """
+    return int(venueartcnt.find({"_id": venue})[0]["count"])
 
 def getTopReferencedVenues(topN):
-    refCnt = getReferenceCount()
-    
-    venuesRefDict = {}
-    for i in refCnt:
-        # keep a track of all the venues in the references set avoid double counting
-        venues = []
-        debug = i["references"] 
-        for ref in i["references"]:
-            art = list(collection.find({"id": ref}, {"venue": 1}))
-            # check whether the cursor is empty
-            if (len(art)==0):
-                continue
-            else:
-                venue = art[0]["venue"]
-                if venue not in venues and venue != "":
-                    venues += [venue]
-                    if venue in venuesRefDict:
-                        venuesRefDict[venue] += 1
-                    else:
-                        venuesRefDict[venue] = 1
-                
-    return list(islice(sorted(venuesRefDict.items(), key=lambda item: item[1]), topN))
+    """find top N venues in term of the number of articles referencing the venue
+
+    Args:
+        topN (int): number of venues to be returned
+
+    Returns:
+        cursor: containing topN venues and number of articles referencing the venue
+    """
+    # https://stackoverflow.com/questions/4421207/how-to-get-the-last-n-records-in-mongodb
+    return venuerefedcnt.find().limit(topN)
+
+# addArticle
+
+def checkId(id):
+    return len(list(collection.find({"id": id})))==0
+
+def addArticle(id, title, authors, year):
+    collection.insert_one({
+        "abstract": None, 
+        "authors": authors, 
+        "n_citation": 0,
+        "references": [], 
+        "title": title, 
+        "venue": None, 
+        "year": year, 
+        "id": id
+        })
+
 
 ###
 # search authors by keyword. will return a list of authors who have name
