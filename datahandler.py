@@ -8,10 +8,12 @@ from pymongo import TEXT
 
 db = None
 collection = None
+venueartcnt = None
 
 def connectDB():
-    global db, collection
+    global db, collection, venueartcnt
     COLLECTIONAME = "dblp"
+    VENUEARTCNT = "venueartcnt"
     DATABASENAME = "291db"
     while(1):
         # port = input("enter port number\n")
@@ -24,18 +26,21 @@ def connectDB():
     client = MongoClient(host="localhost", port=port)
     db = client[DATABASENAME]
     collection = db[COLLECTIONAME]
+    venueartcnt = db[VENUEARTCNT]
     ## TODO: check if collection if empty?
     
-# db for search
+# listVenues
 
-# db for listvenues
-def getVenuesArticleCount():
-    pipeline = [
-        {"$unwind": "$venue"},
-        {"$group": {"_id": "$venue", "count": {"$sum": 1}}}
-    ]
+def getVenuesArticleCount(venue):
+    """returns number of articles in the given venue
 
-    return collection.aggregate(pipeline)
+    Args:
+        venue (string): name of the venue
+
+    Returns:
+        int: number of articles in that venue
+    """
+    return int(venueartcnt.findOne({"_id": venue}).count)
 
 def getReferenceCount():
     # https://stackoverflow.com/questions/944700/how-can-i-check-for-nan-values

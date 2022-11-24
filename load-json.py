@@ -1,7 +1,6 @@
 from pymongo import MongoClient
 from pymongo import TEXT
-import json
-import os
+from bson.son import SON
 import sys
 import pandas as pd
 
@@ -42,13 +41,47 @@ def main(args):
     
     # create a materialized view venueartcnt contains venues and count of articals in each venue
     # https://www.mongodb.com/docs/manual/core/materialized-views/#std-label-manual-materialized-views
-    pipeline = [
+    pipeline1 = [
         {"$unwind": "$venue"},
         {"$match": {"venue": {"$nin": [None, float('nan'), ""]}}},
         {"$group": {"_id": "$venue", "count": {"$sum": 1}}},
         {"$merge": {"into": "venueartcnt", "whenMatched": "replace"}}
     ]
-    collection.aggregate(pipeline)
+    collection.aggregate(pipeline1)
+    
+    pipeline2 = [
+        {"$match": {"references": {"$nin": [None, float('nan'), ""]}}},
+        {"$unwind": "$references"},
+        {"$group": {"_id": "$references", "ids": {"$addToSet": "$id"}}},
+        {"$merge": {"into": "refids", "whenMatched": "replace"}}
+    ]
+    collection.aggregate(pipeline2)
+    
+    pipeline3 = [
+        {"$match": {"venue": {"$nin": [None, float('nan'), ""]}}},
+        {"$group": {"_id": "$venue", "ids": {"$addToSet": "$id"}}},
+        {"$unwind": "$ids"},
+        {
+            "$lookup":
+                {
+                    "from": "refids",
+                    "localField": "ids",
+                    "foreignField": "_id",
+                    "as": "refs"
+                }
+        },
+        {"$unwind": "$refs"},
+        {"$unwind": "$refs.ids"},
+        {"$group": {"_id": "$_id", "refids": {"$addToSet": "$refs.ids"}}},
+        {
+            "$project": {
+                "count": { "$size": "$refids" }
+            }
+        },
+        {"$sort": SON([("count", -1)])},
+        {"$merge": {"into": "venuerefedcnt", "whenMatched": "replace"}}
+    ]
+    collection.aggregate(pipeline3)
 
 if __name__ == "__main__":
     main(sys.argv)
