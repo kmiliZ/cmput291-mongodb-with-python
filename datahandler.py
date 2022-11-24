@@ -101,3 +101,27 @@ def searchAuthorArticlesByName(author):
         print(" {}. title:  {} \n    venue: {} \n    year:  {}".format(count,r["title"],r["venue"],r["year"]))
         count = count +1
     print("\n%d articles in total."%(count-1))
+
+def searchArticlesByKeyWords(keywords):
+    search_string = ""
+    for word in keywords:
+        search_string += "\"{}\"".format(word)
+    print(search_string)
+    results = collection.find({"$text": {"$search": search_string}})
+    return results
+
+def getReferencesByArticleId(id):
+    search_string = "\"{}\"".format(id)
+    results = collection.find({"$text": {"$search": search_string}})
+    count = 0
+    for result in results:
+        if result["id"]!=id:
+            count +=1
+            id = result["id"]
+            title = result["title"]
+            year = result["year"]
+            print("     %5d. %s\n           year: %s\n          id: %s"%(count,title,year,id))
+    print("      # %d results #"%(count))
+
+
+           

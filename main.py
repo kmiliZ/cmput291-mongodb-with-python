@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 import searchAuthors
+import searchArticles
 import listvenues
 import datahandler
 
@@ -17,7 +18,7 @@ def printMenu():
 def processInput(choice):
     if (choice == 1):
         print("chocice 1")
-        searchArticles.searchArticles()
+        return searchArticles.searchArticles()
     elif (choice == 2):
         return searchAuthors.searchAuthors()
     elif (choice == 3):

@@ -4,14 +4,21 @@ from pymongo import TEXT
 import datahandler
 
 
-def printAuthorSelectionMenu():
+def printAuthorSelectionMenu(count):
     menu = '''
     now you can:
             select an author to view details by entering an index, or
             type 0 to return to main menu, or
             type -1 to exit out the program
     '''
-    print(menu)   
+    menu_b = '''
+            type 0 to return to main menu, or
+            type -1 to exit out the program
+    '''
+    if count == 0:
+        print(menu_b) 
+        return
+    print(menu) 
 
 def printSearchSelectionMenu():
     menu = '''
@@ -52,8 +59,7 @@ def searchAuthors():
     keyword = input("enter a key word:")
 
     authors = datahandler.searchAuthorsByKeyWord(keyword)
-
-    printAuthorSelectionMenu()
+    printAuthorSelectionMenu(len(authors))
     selected = takeAuthorIndexSelectionInput(len(authors))
     
     if selected==0:
@@ -63,7 +69,7 @@ def searchAuthors():
     author_name = authors[selected-1]
     print("you selected %d. showing articles by %s"%(selected,author_name))
 
-    datahandler.searchAuthorArticlesByName(author_name)
+    count = datahandler.searchAuthorArticlesByName(author_name)
     printSearchSelectionMenu()
     action = takeUserActionInput()
     return action
